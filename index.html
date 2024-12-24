@@ -17,6 +17,7 @@
         color: white;
         touch-action: none;
         overflow: hidden;
+        min-height: 100vh;
     }
 
     .game-container {
@@ -25,6 +26,7 @@
         margin: 0 auto;
         padding: 20px;
         text-align: center;
+        margin-bottom: 200px; /* 为控制按钮留出空间 */
     }
 
     h1 {
@@ -67,16 +69,22 @@
     }
 
     .controls {
-        margin-top: 20px;
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 10px;
+        gap: 8px;
+        background: rgba(0, 0, 0, 0.5);
+        padding: 10px;
+        border-radius: 15px;
+        z-index: 1000;
     }
 
     .control-row {
         display: flex;
-        gap: 20px;
+        gap: 8px;
         justify-content: center;
     }
 
@@ -85,13 +93,14 @@
         color: white;
         border: none;
         border-radius: 10px;
-        font-size: 24px;
+        font-size: 28px;
         cursor: pointer;
         touch-action: manipulation;
-        width: 70px;
-        height: 70px;
+        width: 65px;
+        height: 65px;
         box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         transition: transform 0.1s;
+        -webkit-tap-highlight-color: transparent;
     }
 
     .main-button:active,
@@ -109,6 +118,7 @@
         padding: 20px;
         border-radius: 10px;
         text-align: center;
+        z-index: 2000;
     }
 
     .hidden {
@@ -124,14 +134,20 @@
             font-size: 20px;
         }
 
-        .control-button {
-            width: 60px;
-            height: 60px;
-            font-size: 20px;
+        .controls {
+            bottom: 10px;
+            right: 10px;
+            gap: 6px;
         }
 
         .control-row {
-            gap: 15px;
+            gap: 6px;
+        }
+
+        .control-button {
+            width: 55px;
+            height: 55px;
+            font-size: 24px;
         }
     }
     </style>
@@ -149,23 +165,26 @@
             <button id="startButton" class="main-button">开始游戏</button>
             <button id="pauseButton" class="main-button hidden">暂停</button>
         </div>
-        <div class="controls">
-            <div class="control-row">
-                <button id="upButton" class="control-button">↑</button>
-            </div>
-            <div class="control-row">
-                <button id="leftButton" class="control-button">←</button>
-                <button id="rightButton" class="control-button">→</button>
-            </div>
-            <div class="control-row">
-                <button id="downButton" class="control-button">↓</button>
-            </div>
+    </div>
+    
+    <div class="controls">
+        <div class="control-row">
+            <button id="upButton" class="control-button">↑</button>
+        </div>
+        <div class="control-row">
+            <button id="leftButton" class="control-button">←</button>
+            <button id="rightButton" class="control-button">→</button>
+        </div>
+        <div class="control-row">
+            <button id="downButton" class="control-button">↓</button>
         </div>
     </div>
+
     <div id="gameOver" class="hidden">
         <h2>游戏结束</h2>
         <button id="restartButton" class="main-button">重新开始</button>
     </div>
+
         <script>
     class Snake {
         constructor(canvas) {
