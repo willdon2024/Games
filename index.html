@@ -17,6 +17,7 @@
         color: white;
         touch-action: none;
         overflow: hidden;
+        min-height: 100vh;
     }
 
     .game-container {
@@ -51,50 +52,74 @@
     }
 
     .game-buttons {
-        margin: 10px 0;
+        position: fixed;
+        right: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        z-index: 1000;
     }
 
     .main-button {
         background: #4CAF50;
         color: white;
         border: none;
-        padding: 12px 24px;
-        border-radius: 5px;
+        padding: 15px 25px;
+        border-radius: 10px;
         font-size: 18px;
-        margin: 5px;
         cursor: pointer;
         touch-action: manipulation;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        transition: transform 0.1s;
+    }
+
+    .main-button:active {
+        transform: scale(0.95);
+        background: #1B5E20;
     }
 
     .controls {
-        margin-top: 20px;
+        position: fixed;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%);
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 10px;
+        gap: 15px;
+        background: rgba(0, 0, 0, 0.5);
+        padding: 15px;
+        border-radius: 20px;
+        z-index: 1000;
     }
 
     .control-row {
         display: flex;
-        gap: 20px;
+        gap: 80px;
         justify-content: center;
+    }
+
+    .up-row, .down-row {
+        margin: 10px 0;
     }
 
     .control-button {
         background: #2E7D32;
         color: white;
         border: none;
-        border-radius: 10px;
-        font-size: 24px;
+        border-radius: 15px;
+        font-size: 32px;
         cursor: pointer;
         touch-action: manipulation;
-        width: 70px;
-        height: 70px;
+        width: 80px;
+        height: 80px;
         box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         transition: transform 0.1s;
+        -webkit-tap-highlight-color: transparent;
     }
 
-    .main-button:active,
     .control-button:active {
         background: #1B5E20;
         transform: scale(0.95);
@@ -109,6 +134,7 @@
         padding: 20px;
         border-radius: 10px;
         text-align: center;
+        z-index: 2000;
     }
 
     .hidden {
@@ -124,14 +150,28 @@
             font-size: 20px;
         }
 
-        .control-button {
-            width: 60px;
-            height: 60px;
-            font-size: 20px;
+        .controls {
+            bottom: 20px;
+            gap: 12px;
         }
 
         .control-row {
-            gap: 15px;
+            gap: 60px;
+        }
+
+        .control-button {
+            width: 65px;
+            height: 65px;
+            font-size: 28px;
+        }
+
+        .game-buttons {
+            right: 10px;
+        }
+
+        .main-button {
+            padding: 12px 20px;
+            font-size: 16px;
         }
     }
     </style>
@@ -145,23 +185,26 @@
             <div class="level">等级: 1</div>
         </div>
         <canvas id="gameCanvas"></canvas>
-        <div class="game-buttons">
-            <button id="startButton" class="main-button">开始游戏</button>
-            <button id="pauseButton" class="main-button hidden">暂停</button>
+    </div>
+
+    <div class="game-buttons">
+        <button id="startButton" class="main-button">开始游戏</button>
+        <button id="pauseButton" class="main-button hidden">暂停</button>
+    </div>
+
+    <div class="controls">
+        <div class="control-row up-row">
+            <button id="upButton" class="control-button">↑</button>
         </div>
-        <div class="controls">
-            <div class="control-row">
-                <button id="upButton" class="control-button">↑</button>
-            </div>
-            <div class="control-row">
-                <button id="leftButton" class="control-button">←</button>
-                <button id="rightButton" class="control-button">→</button>
-            </div>
-            <div class="control-row">
-                <button id="downButton" class="control-button">↓</button>
-            </div>
+        <div class="control-row middle-row">
+            <button id="leftButton" class="control-button">←</button>
+            <button id="rightButton" class="control-button">→</button>
+        </div>
+        <div class="control-row down-row">
+            <button id="downButton" class="control-button">↓</button>
         </div>
     </div>
+
     <div id="gameOver" class="hidden">
         <h2>游戏结束</h2>
         <button id="restartButton" class="main-button">重新开始</button>
@@ -397,7 +440,6 @@
             document.getElementById('pauseButton').onclick = () => this.togglePause();
             document.getElementById('restartButton').onclick = () => this.restart();
         }
-
         startGame() {
             if (!this.started) {
                 this.started = true;
