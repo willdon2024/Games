@@ -136,6 +136,14 @@
             this.canvas = canvas;
             this.ctx = canvas.getContext('2d');
             this.tileSize = 20;
+            // 定义蛇身的不同颜色
+            this.colors = [
+                '#4CAF50', // 绿色
+                '#8BC34A', // 浅绿色
+                '#CDDC39', // 黄绿色
+                '#66BB6A', // 中绿色
+                '#81C784'  // 淡绿色
+            ];
             this.reset();
         }
 
@@ -149,8 +157,9 @@
         }
 
         draw() {
-            this.ctx.fillStyle = '#00ff00';
             this.body.forEach((segment, index) => {
+                // 使用不同的颜色
+                this.ctx.fillStyle = this.colors[index % this.colors.length];
                 this.ctx.beginPath();
                 this.ctx.rect(
                     segment.x * this.tileSize,
@@ -161,7 +170,7 @@
                 this.ctx.fill();
                 
                 // 添加发光效果
-                this.ctx.shadowColor = '#00ff00';
+                this.ctx.shadowColor = this.colors[index % this.colors.length];
                 this.ctx.shadowBlur = 10;
                 this.ctx.fill();
                 this.ctx.shadowBlur = 0;
@@ -226,12 +235,58 @@
             this.lives = 3;
             this.paused = false;
             this.gameOver = false;
+            this.moveTimeInterval = 200; // 初始速度更慢
             
+            // 设置音效
+            this.setupSounds();
             this.setupControls();
             this.spawnFood();
             this.updateUI();
             
             this.gameLoop();
+        }
+
+        setupSounds() {
+            // 创建简单的音效
+            this.sounds = {
+                eat: new Audio('data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgA'),
+                die: new Audio('data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgA'),
+                levelUp: new Audio('data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgA')
+            };
+
+            // 创建音频上下文
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            
+            // 创建音效函数
+            this.playSound = (type) => {
+                const oscillator = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+
+                switch(type) {
+                    case 'eat':
+                        oscillator.frequency.setValueAtTime(880, audioCtx.currentTime);
+                        gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                        oscillator.start(audioCtx.currentTime);
+                        oscillator.stop(audioCtx.currentTime + 0.1);
+                        break;
+                    case 'die':
+                        oscillator.frequency.setValueAtTime(110, audioCtx.currentTime);
+                        gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                        oscillator.start(audioCtx.currentTime);
+                        oscillator.stop(audioCtx.currentTime + 0.3);
+                        break;
+                    case 'levelUp':
+                        oscillator.frequency.setValueAtTime(440, audioCtx.currentTime);
+                        gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                        oscillator.start(audioCtx.currentTime);
+                        oscillator.frequency.setValueAtTime(880, audioCtx.currentTime + 0.1);
+                        oscillator.stop(audioCtx.currentTime + 0.2);
+                        break;
+                }
+            };
         }
 
         setupCanvas() {
@@ -311,7 +366,7 @@
             this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
             
             // 绘制食物
-            this.ctx.fillStyle = '#ff0000';
+            this.ctx.fillStyle = '#ff4444';
             this.ctx.beginPath();
             this.ctx.rect(
                 this.food.x * this.snake.tileSize,
@@ -339,6 +394,7 @@
                 this.snake.body[0].y === this.food.y) {
                 this.snake.grow();
                 this.score += 10;
+                this.playSound('eat');
                 this.spawnFood();
                 this.updateUI();
                 this.checkLevelUp();
@@ -346,6 +402,7 @@
         }
 
         handleCollision() {
+            this.playSound('die');
             this.lives--;
             this.updateUI();
 
@@ -361,7 +418,10 @@
             const newLevel = Math.floor(this.score / 50) + 1;
             if (newLevel !== this.level) {
                 this.level = newLevel;
+                this.playSound('levelUp');
                 this.updateUI();
+                // 速度增长更缓慢
+                this.moveTimeInterval = Math.max(150, 200 - (this.level - 1) * 5);
             }
         }
 
@@ -383,6 +443,7 @@
             this.lives = 3;
             this.gameOver = false;
             this.paused = false;
+            this.moveTimeInterval = 200;
             this.snake.reset();
             this.spawnFood();
             this.updateUI();
@@ -394,7 +455,7 @@
             this.update();
             this.draw();
             setTimeout(() => requestAnimationFrame(() => this.gameLoop()),
-                Math.max(100 - (this.level - 1) * 10, 50));
+                this.moveTimeInterval);
         }
     }
 
