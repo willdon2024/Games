@@ -72,12 +72,12 @@
         border: none;
         padding: 8px;
         border-radius: 5px;
-        font-size: 14px;
-        margin: 3px;
+        font-size: 18px;
+        margin: 4px;
         cursor: pointer;
         touch-action: manipulation;
-        width: 40px;
-        height: 40px;
+        width: 50px;
+        height: 50px;
     }
 
     .main-button:active,
@@ -114,9 +114,9 @@
         }
 
         .control-button {
-            width: 35px;
-            height: 35px;
-            font-size: 12px;
+            width: 45px;
+            height: 45px;
+            font-size: 16px;
         }
     }
     </style>
@@ -145,8 +145,7 @@
         <h2>游戏结束</h2>
         <button id="restartButton" class="main-button">重新开始</button>
     </div>
-
-        <script>
+    <script>
     class Snake {
         constructor(canvas) {
             this.canvas = canvas;
@@ -252,7 +251,7 @@
             this.paused = false;
             this.gameOver = false;
             this.started = false;
-            this.moveTimeInterval = 300; // 更慢的初始速度
+            this.moveTimeInterval = 350; // 更慢的初始速度
             
             this.setupSounds();
             this.setupControls();
@@ -273,23 +272,38 @@
 
                 switch(type) {
                     case 'eat':
-                        oscillator.frequency.setValueAtTime(880, audioCtx.currentTime);
-                        gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                        // 超级玛丽吃金币音效
+                        oscillator.type = 'square';
+                        oscillator.frequency.setValueAtTime(988, audioCtx.currentTime);
+                        gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime);
                         oscillator.start(audioCtx.currentTime);
-                        oscillator.stop(audioCtx.currentTime + 0.1);
+                        oscillator.frequency.setValueAtTime(1319, audioCtx.currentTime + 0.08);
+                        oscillator.stop(audioCtx.currentTime + 0.16);
                         break;
                     case 'die':
-                        oscillator.frequency.setValueAtTime(110, audioCtx.currentTime);
-                        gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                        // 超级玛丽死亡音效
+                        oscillator.type = 'square';
+                        oscillator.frequency.setValueAtTime(880, audioCtx.currentTime);
+                        gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
                         oscillator.start(audioCtx.currentTime);
-                        oscillator.stop(audioCtx.currentTime + 0.3);
+                        
+                        // 下降音阶
+                        for(let i = 0; i < 10; i++) {
+                            oscillator.frequency.setValueAtTime(880 - i * 80, audioCtx.currentTime + i * 0.05);
+                        }
+                        oscillator.stop(audioCtx.currentTime + 0.5);
                         break;
                     case 'levelUp':
-                        oscillator.frequency.setValueAtTime(440, audioCtx.currentTime);
-                        gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                        // 超级玛丽升级音效
+                        oscillator.type = 'square';
+                        const notes = [784, 988, 1319, 1567];
+                        const duration = 0.1;
+                        
                         oscillator.start(audioCtx.currentTime);
-                        oscillator.frequency.setValueAtTime(880, audioCtx.currentTime + 0.1);
-                        oscillator.stop(audioCtx.currentTime + 0.2);
+                        notes.forEach((note, index) => {
+                            oscillator.frequency.setValueAtTime(note, audioCtx.currentTime + index * duration);
+                        });
+                        oscillator.stop(audioCtx.currentTime + notes.length * duration);
                         break;
                 }
             };
@@ -437,7 +451,7 @@
                 this.playSound('levelUp');
                 this.updateUI();
                 // 速度增长更缓慢
-                this.moveTimeInterval = Math.max(200, 300 - (this.level - 1) * 3);
+                this.moveTimeInterval = Math.max(250, 350 - (this.level - 1) * 2);
             }
         }
 
@@ -460,7 +474,7 @@
             this.gameOver = false;
             this.paused = false;
             this.started = false;
-            this.moveTimeInterval = 300;
+            this.moveTimeInterval = 350;
             this.snake.reset();
             this.spawnFood();
             this.updateUI();
