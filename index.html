@@ -66,27 +66,38 @@
         touch-action: manipulation;
     }
 
+    .controls {
+        margin-top: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .control-row {
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+    }
+
     .control-button {
         background: #2E7D32;
         color: white;
         border: none;
-        padding: 8px;
-        border-radius: 5px;
-        font-size: 18px;
-        margin: 4px;
+        border-radius: 10px;
+        font-size: 24px;
         cursor: pointer;
         touch-action: manipulation;
-        width: 50px;
-        height: 50px;
+        width: 70px;
+        height: 70px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        transition: transform 0.1s;
     }
 
     .main-button:active,
     .control-button:active {
         background: #1B5E20;
-    }
-
-    .controls {
-        margin-top: 15px;
+        transform: scale(0.95);
     }
 
     #gameOver {
@@ -114,9 +125,13 @@
         }
 
         .control-button {
-            width: 45px;
-            height: 45px;
-            font-size: 16px;
+            width: 60px;
+            height: 60px;
+            font-size: 20px;
+        }
+
+        .control-row {
+            gap: 15px;
         }
     }
     </style>
@@ -135,17 +150,23 @@
             <button id="pauseButton" class="main-button hidden">暂停</button>
         </div>
         <div class="controls">
-            <button id="upButton" class="control-button">↑</button><br>
-            <button id="leftButton" class="control-button">←</button>
-            <button id="rightButton" class="control-button">→</button><br>
-            <button id="downButton" class="control-button">↓</button>
+            <div class="control-row">
+                <button id="upButton" class="control-button">↑</button>
+            </div>
+            <div class="control-row">
+                <button id="leftButton" class="control-button">←</button>
+                <button id="rightButton" class="control-button">→</button>
+            </div>
+            <div class="control-row">
+                <button id="downButton" class="control-button">↓</button>
+            </div>
         </div>
     </div>
     <div id="gameOver" class="hidden">
         <h2>游戏结束</h2>
         <button id="restartButton" class="main-button">重新开始</button>
     </div>
-    <script>
+        <script>
     class Snake {
         constructor(canvas) {
             this.canvas = canvas;
